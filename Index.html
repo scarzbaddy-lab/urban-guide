@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unscarred Mask Matrix System</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@300;400;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Cormorant Garamond', serif;
+      background: radial-gradient(ellipse at top, #1a0933 0%, #0a0a0f 50%, #000000 100%);
+      color: #e8d4b8;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container { max-width: 1400px; margin: 0 auto; }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 2.5rem;
+      text-align: center;
+      background: linear-gradient(135deg, #d4af37 0%, #f4d03f 50%, #d4af37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #b8a084;
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 12px 18px;
+      background: rgba(90, 24, 154, 0.3);
+      border: 2px solid #8b008b;
+      color: #d4af37;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .tab:hover { background: rgba(90, 24, 154, 0.6); }
+
+    .tab.active {
+      background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+      color: #1a0933;
+      border-color: #d4af37;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .view-header { text-align: center; margin-bottom: 20px; }
+
+    .view-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      color: #d4af37;
+      margin-bottom: 10px;
+    }
+
+    .view-description {
+      color: #b8a084;
+      font-size: 1rem;
+      max-width: 700px;
+      margin: 0 auto 10px;
+    }
+
+    .hover-hint { color: #d4af37; font-style: italic; font-size: 0.9rem; }
+
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: #1a0933;
+      border: 2px solid rgba(212, 175, 55, 0.4);
+      border-radius: 8px;
+      max-width: 100%;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(26, 9, 51, 0.5);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 4px;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid rgba(212, 175, 55, 0.5);
+    }
+
+    .legend-label { color: #d4af37; font-size: 0.85rem; }
+
+    .quiz-container { max-width: 800px; margin: 0 auto; }
+
+    .quiz-header { text-align: center; margin-bottom: 40px; }
+
+    .question { display: none; margin-bottom: 30px; }
+    .question.active { display: block; }
+
+    .question-text {
+      font-size: 1.3rem;
+      color: #d4af37;
+      margin-bottom: 25px;
+      text-align: center;
+      font-family: 'Cinzel', serif;
+    }
+
+    .answers { display: flex; flex-direction: column; gap: 15px; }
+
+    .answer-btn {
+      padding: 20px;
+      background: rgba(90, 24, 154, 0.3);
+      border: 2px solid #8b008b;
+      color: #e8d4b8;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: left;
+    }
+
+    .answer-btn:hover {
+      background: rgba(90, 24, 154, 0.6);
+      border-color: #d4af37;
+      transform: translateX(10px);
+    }
+
+    #result-content {
+      background: rgba(90, 24, 154, 0.3);
+      border: 2px solid #d4af37;
+      padding: 30px;
+      margin: 30px 0;
+      border-radius: 8px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .result-card {
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 10px;
+      padding: 18px;
+      background: rgba(26, 9, 51, 0.35);
+    }
+
+    .result-rank {
+      font-family: 'Cinzel', serif;
+      color: #d4af37;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .result-mask-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+
+    .result-detail { margin: 10px 0; font-size: 1.1rem; }
+
+    .result-label {
+      color: #d4af37;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .view-matrices-btn {
+      display: block;
+      margin: 30px auto;
+      padding: 15px 40px;
+      background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+      color: #1a0933;
+      border: none;
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-radius: 10px;
+    }
+
+    .view-matrices-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+    }
+
+    .tooltip {
+      position: fixed;
+      background: linear-gradient(135deg, rgba(26, 9, 51, 0.98) 0%, rgba(90, 24, 154, 0.98) 100%);
+      border: 2px solid #d4af37;
+      border-radius: 8px;
+      padding: 15px;
+      max-width: 320px;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.2s;
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+      display: none;
+    }
+
+    .tooltip.visible { opacity: 1; }
+
+    .tooltip-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      color: #d4af37;
+      margin-bottom: 8px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      padding-bottom: 5px;
+    }
+
+    .tooltip-row { margin: 6px 0; font-size: 0.9rem; }
+
+    .tooltip-label {
+      color: #d4af37;
+      font-weight: 600;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tooltip-value { color: #e8d4b8; margin-top: 2px; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Unscarred Mask Matrix System</h1>
+    <p class="subtitle">30 defensive masks across 6 dimensional frameworks</p>
+
+    <!-- Quiz Page -->
+    <div id="quiz-page" class="quiz-container">
+      <div class="quiz-header">
+        <h2 class="view-title">Which Mask Do You Wear?</h2>
+        <p class="view-description">Answer these questions to discover your top 3 defensive patterns</p>
+      </div>
+
+      <div id="quiz-questions">
+        <div class="question active" data-q="1">
+          <p class="question-text">When conflict arises in relationships, I tend to:</p>
+          <div class="answers">
+            <button class="answer-btn" data-score='{"anxiety":5,"avoidance":1,"meta":2}'>Panic and do anything to fix it immediately</button>
+            <button class="answer-btn" data-score='{"anxiety":2,"avoidance":5,"meta":4}'>Shut down emotionally and create distance</button>
+            <button class="answer-btn" data-score='{"anxiety":4,"avoidance":1,"meta":3}'>Try to smooth things over and keep the peace</button>
+            <button class="answer-btn" data-score='{"anxiety":3,"avoidance":3,"meta":4}'>Analyze what went wrong logically</button>
+          </div>
+        </div>
+
+        <div class="question" data-q="2">
+          <p class="question-text">When I feel vulnerable or exposed, I:</p>
+          <div class="answers">
+            <button class="answer-btn" data-score='{"empathy":1,"meta":4,"strategy":"power"}'>Get defensive and assert control</button>
+            <button class="answer-btn" data-score='{"empathy":4,"meta":1,"strategy":"rescue"}'>Focus on helping others instead</button>
+            <button class="answer-btn" data-score='{"empathy":1,"meta":2,"strategy":"performance"}'>Put on a performance or mask</button>
+            <button class="answer-btn" data-score='{"empathy":3,"meta":3,"strategy":"withdrawal"}'>Retreat and isolate myself</button>
+          </div>
+        </div>
+
+        <div class="question" data-q="3">
+          <p class="question-text">My biggest fear in relationships is:</p>
+          <div class="answers">
+            <button class="answer-btn" data-score='{"anxiety":5,"avoidance":1}'>Being abandoned or rejected</button>
+            <button class="answer-btn" data-score='{"anxiety":2,"avoidance":5}'>Being trapped or controlled</button>
+            <button class="answer-btn" data-score='{"anxiety":5,"avoidance":4}'>Being powerless or hurt</button>
+            <button class="answer-btn" data-score='{"anxiety":4,"avoidance":2}'>Not being good enough</button>
+          </div>
+        </div>
+
+        <div class="question" data-q="4">
+          <p class="question-text">When someone needs me, I:</p>
+          <div class="answers">
+            <button class="answer-btn" data-score='{"empathy":5,"canSayNo":1,"strategy":"rescue"}'>Drop everything to help them</button>
+            <button class="answer-btn" data-score='{"empathy":1,"canSayNo":5,"strategy":"power"}'>Assess if it's worth my time</button>
+            <button class="answer-btn" data-score='{"empathy":3,"canSayNo":3,"strategy":"analysis"}'>Try to problem solve for them</button>
+            <button class="answer-btn" data-score='{"empathy":2,"canSayNo":4,"strategy":"withdrawal"}'>Feel uncomfortable and want to escape</button>
+          </div>
+        </div>
+
+        <div class="question" data-q="5">
+          <p class="question-text">When I'm stressed, my nervous system:</p>
+          <div class="answers">
+            <button class="answer-btn" data-score='{"activation":5}'>Goes into complete survival mode, I'm flooded</button>
+            <button class="answer-btn" data-score='{"activation":4}'>Gets very reactive and hypervigilant</button>
+            <button class="answer-btn" data-score='{"activation":3}'>Stays engaged but I can feel the tension</button>
+            <button class="answer-btn" data-score='{"activation":1}'>Shuts down completely, I go numb</button>
+          </div>
+        </div>
+
+        <div class="question" data-q="6">
+          <p class="question-text">I struggle most with:</p>
+          <div class="answers">
+            <button class="answer-btn" data-score='{"canSayNo":1,"canLeave":1}'>Setting any boundaries at all</button>
+            <button class="answer-btn" data-score='{"canSayNo":5,"canLeave":5}'>Letting people get close to me</button>
+            <button class="answer-btn" data-score='{"canSayNo":1,"canLeave":4}'>Saying no but I can leave when needed</button>
+            <button class="answer-btn" data-score='{"canSayNo":5,"canLeave":2}'>Standing my ground but I feel trapped</button>
+          </div>
+        </div>
+
+        <div class="question" data-q="7">
+          <p class="question-text">People would describe me as:</p>
+          <div class="answers">
+            <button class="answer-btn" data-score='{"strategy":"performance","empathy":4}'>Charming and adaptable</button>
+            <button class="answer-btn" data-score='{"strategy":"power","empathy":1}'>Strong and intimidating</button>
+            <button class="answer-btn" data-score='{"strategy":"rescue","empathy":5}'>Selfless and giving</button>
+            <button class="answer-btn" data-score='{"strategy":"analysis","empathy":2}'>Logical and analytical</button>
+          </div>
+        </div>
+
+        <div class="question" data-q="8">
+          <p class="question-text">When I'm in a group, I often:</p>
+          <div class="answers">
+            <button class="answer-btn" data-score='{"meta":5,"empathy":3,"strategy":"analysis"}'>Notice patterns and connections no one else sees</button>
+            <button class="answer-btn" data-score='{"meta":4,"empathy":4,"strategy":"performance"}'>Translate between people who aren't understanding each other</button>
+            <button class="answer-btn" data-score='{"meta":2,"empathy":5,"strategy":"rescue"}'>Focus on making sure everyone feels included</button>
+            <button class="answer-btn" data-score='{"meta":1,"empathy":1,"strategy":"withdrawal"}'>Feel overwhelmed and want to leave</button>
+          </div>
+        </div>
+
+        <div class="question" data-q="9">
+          <p class="question-text">My exhaustion comes from:</p>
+          <div class="answers">
+            <button class="answer-btn" data-score='{"meta":5,"empathy":3}'>Seeing what's wrong and feeling like I have to fix it</button>
+            <button class="answer-btn" data-score='{"meta":4,"empathy":4}'>Being the bridge between people constantly</button>
+            <button class="answer-btn" data-score='{"meta":1,"empathy":5}'>Absorbing everyone's emotions</button>
+            <button class="answer-btn" data-score='{"meta":2,"empathy":1}'>Performing constantly to be accepted</button>
+          </div>
+        </div>
+
+        <div class="question" data-q="10">
+          <p class="question-text">I feel most frustrated when:</p>
+          <div class="answers">
+            <button class="answer-btn" data-score='{"meta":5,"empathy":3}'>People can't see the obvious pattern I'm pointing out</button>
+            <button class="answer-btn" data-score='{"meta":4,"empathy":4}'>People misunderstand each other and I have to explain</button>
+            <button class="answer-btn" data-score='{"meta":1,"empathy":4}'>I can't help someone who's hurting</button>
+            <button class="answer-btn" data-score='{"meta":2,"empathy":1}'>People don't appreciate what I do</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="quiz-result" style="display:none;">
+        <h2 class="view-title">Your Top 3 Masks</h2>
+        <div id="result-content"></div>
+        <button id="explore-btn" class="view-matrices-btn">Explore Your Masks on the Matrices</button>
+      </div>
+    </div>
+
+    <!-- Matrix Views -->
+    <div id="matrix-page" style="display:none;">
+      <div class="tabs">
+        <button class="tab active" data-view="attachment">Attachment</button>
+        <button class="tab" data-view="metaemp">Meta × Empathy</button>
+        <button class="tab" data-view="activation">NS Activation</button>
+        <button class="tab" data-view="strategy">Strategy Types</button>
+        <button class="tab" data-view="transform">Shadow → Light</button>
+        <button class="tab" data-view="boundary">Boundary Strength</button>
+      </div>
+
+      <div class="view active" id="view-attachment">
+        <div class="view-header">
+          <h2 class="view-title">Attachment Matrix</h2>
+          <p class="view-description">Anxiety × Avoidance patterns</p>
+          <p class="hover-hint">✨ Hover over dots for details</p>
+        </div>
+        <canvas id="canvas-attachment"></canvas>
+      </div>
+
+      <div class="view" id="view-metaemp">
+        <div class="view-header">
+          <h2 class="view-title">Metacognition × Empathy</h2>
+          <p class="view-description">Awareness × Connection capacity</p>
+          <p class="hover-hint">✨ Hover over dots for details</p>
+        </div>
+        <canvas id="canvas-metaemp"></canvas>
+      </div>
+
+      <div class="view" id="view-activation">
+        <div class="view-header">
+          <h2 class="view-title">Nervous System Activation</h2>
+          <p class="view-description">Concentric rings by activation level</p>
+          <p class="hover-hint">✨ Hover over dots for details</p>
+        </div>
+        <canvas id="canvas-activation"></canvas>
+      </div>
+
+      <div class="view" id="view-strategy">
+        <div class="view-header">
+          <h2 class="view-title">Defense Strategy Types</h2>
+          <p class="view-description">Grouped by defensive strategy</p>
+          <p class="hover-hint">✨ Hover over dots for details</p>
+        </div>
+        <canvas id="canvas-strategy"></canvas>
+      </div>
+
+      <div class="view" id="view-transform">
+        <div class="view-header">
+          <h2 class="view-title">Shadow → Light Transformation</h2>
+          <p class="view-description">Wounded to integrated expression</p>
+          <p class="hover-hint">✨ Hover over dots for details</p>
+        </div>
+        <canvas id="canvas-transform"></canvas>
+      </div>
+
+      <div class="view" id="view-boundary">
+        <div class="view-header">
+          <h2 class="view-title">Boundary Strength Matrix</h2>
+          <p class="view-description">Can Say No × Can Leave</p>
+          <p class="hover-hint">✨ Hover over dots for details</p>
+        </div>
+        <canvas id="canvas-boundary"></canvas>
+      </div>
+
+      <div class="legend" id="legend"></div>
+    </div>
+
+    <div class="tooltip" id="tooltip">
+      <div class="tooltip-title"></div>
+    </div>
+  </div>
+
+  <script>
+    const masks = {
+      chameleon: { name: "Chameleon", wound: "Not being accepted", fear: "Rejection/abandonment", light: "Adapter", strategy: "performance", anxiety: 5, avoidance: 1, meta: 2, empathy: 4, activation: 4, canSayNo: 2, canLeave: 4 },
+      untouchable: { name: "Untouchable", wound: "Vulnerability = danger", fear: "People getting close will hurt me", light: "Guardian", strategy: "power", anxiety: 2, avoidance: 5, meta: 4, empathy: 1, activation: 3, canSayNo: 5, canLeave: 5 },
+      martyr: { name: "Martyr", wound: "Needs are burdensome", fear: "If I ask I'll be rejected", light: "Devoted Servant", strategy: "rescue", anxiety: 4, avoidance: 2, meta: 2, empathy: 3, activation: 3, canSayNo: 1, canLeave: 2 },
+      clown: { name: "Clown", wound: "Not being taken seriously", fear: "People won't take me seriously", light: "Lightbringer", strategy: "performance", anxiety: 4, avoidance: 1, meta: 2, empathy: 4, activation: 3, canSayNo: 3, canLeave: 3 },
+      general: { name: "General", wound: "Chaos = danger", fear: "Things will fall apart", light: "Leader", strategy: "power", anxiety: 3, avoidance: 3, meta: 4, empathy: 1, activation: 3, canSayNo: 5, canLeave: 3 },
+      queen: { name: "Queen/King", wound: "Being ordinary = unsafe", fear: "I'll be discarded if not special", light: "Sovereign", strategy: "power", anxiety: 4, avoidance: 3, meta: 4, empathy: 1, activation: 4, canSayNo: 5, canLeave: 4 },
+      victim: { name: "Victim", wound: "Power is dangerous", fear: "If I have power I'll be hurt", light: "Survivor", strategy: "collapse", anxiety: 5, avoidance: 4, meta: 1, empathy: 3, activation: 4, canSayNo: 1, canLeave: 1 },
+      scholar: { name: "Scholar", wound: "Being misunderstood", fear: "Being taken advantage of", light: "Wise Sage", strategy: "analysis", anxiety: 4, avoidance: 4, meta: 5, empathy: 2, activation: 3, canSayNo: 4, canLeave: 4 },
+      ghost: { name: "Ghost", wound: "Being overwhelmed", fear: "I'll be consumed if I stay", light: "Mystic", strategy: "withdrawal", anxiety: 5, avoidance: 5, meta: 3, empathy: 3, activation: 5, canSayNo: 2, canLeave: 5 },
+      diplomat: { name: "Diplomat", wound: "Conflict = danger", fear: "Conflict will lose connection", light: "Peaceweaver", strategy: "performance", anxiety: 4, avoidance: 1, meta: 3, empathy: 3, activation: 3, canSayNo: 2, canLeave: 3 },
+      performer: { name: "Performer", wound: "Being invisible", fear: "If no one watches I disappear", light: "Artist", strategy: "performance", anxiety: 4, avoidance: 2, meta: 2, empathy: 1, activation: 3, canSayNo: 3, canLeave: 3 },
+      hero: { name: "Hero Fixer", wound: "Only valuable when useful", fear: "I'll be discarded if not needed", light: "Guide", strategy: "rescue", anxiety: 4, avoidance: 2, meta: 3, empathy: 4, activation: 3, canSayNo: 2, canLeave: 2 },
+      savior: { name: "Savior", wound: "Only valuable when rescuing", fear: "Worthless if not saving", light: "Liberator", strategy: "rescue", anxiety: 4, avoidance: 2, meta: 3, empathy: 3, activation: 3, canSayNo: 2, canLeave: 3 },
+      saint: { name: "Saint", wound: "Only lovable when selfless", fear: "Rejected if not perfect", light: "Humble Servant", strategy: "rescue", anxiety: 4, avoidance: 2, meta: 1, empathy: 4, activation: 3, canSayNo: 1, canLeave: 2 },
+      judge: { name: "Judge", wound: "Being flawed = shameful", fear: "If wrong I'm worthless", light: "Discerner", strategy: "power", anxiety: 3, avoidance: 3, meta: 4, empathy: 2, activation: 3, canSayNo: 4, canLeave: 3 },
+      critic: { name: "Critic", wound: "Feeling small/inferior", fear: "If you're big I'll be crushed", light: "Mentor", strategy: "power", anxiety: 4, avoidance: 3, meta: 4, empathy: 2, activation: 4, canSayNo: 4, canLeave: 3 },
+      stoic: { name: "Stoic", wound: "Emotions = danger", fear: "If I feel things will break", light: "Steadfast", strategy: "withdrawal", anxiety: 3, avoidance: 5, meta: 3, empathy: 2, activation: 1, canSayNo: 4, canLeave: 4 },
+      rebel: { name: "Rebel", wound: "Being controlled/trapped", fear: "Rules will cage me", light: "Revolutionary", strategy: "volatility", anxiety: 4, avoidance: 3, meta: 1, empathy: 2, activation: 4, canSayNo: 5, canLeave: 4 },
+      lonewolf: { name: "Lone Wolf", wound: "Connection = danger", fear: "People will hurt me if I need them", light: "Sovereign Self", strategy: "withdrawal", anxiety: 3, avoidance: 5, meta: 3, empathy: 3, activation: 3, canSayNo: 4, canLeave: 5 },
+      sage: { name: "Sage", wound: "Feelings = chaos", fear: "I'll be overwhelmed if I feel", light: "Embodied Wisdom", strategy: "analysis", anxiety: 3, avoidance: 4, meta: 5, empathy: 2, activation: 3, canSayNo: 4, canLeave: 4 },
+      perfectionist: { name: "Perfectionist", wound: "Being flawed = being rejected", fear: "Any mistake will expose me", light: "Craftsperson", strategy: "analysis", anxiety: 5, avoidance: 3, meta: 3, empathy: 2, activation: 4, canSayNo: 2, canLeave: 2 },
+      fortress: { name: "Fortress", wound: "Dependency = weakness", fear: "Needing anyone will destroy me", light: "Mountain", strategy: "withdrawal", anxiety: 1, avoidance: 5, meta: 5, empathy: 1, activation: 2, canSayNo: 5, canLeave: 5 },
+      shapeshifter: { name: "Shapeshifter", wound: "Having a fixed self = being trapped", fear: "Being known will cage me", light: "Alchemist", strategy: "volatility", anxiety: 4, avoidance: 4, meta: 2, empathy: 3, activation: 5, canSayNo: 3, canLeave: 4 },
+      empath: { name: "Empath", wound: "Others pain is my responsibility", fear: "If I don't absorb their pain they'll suffer", light: "Healer", strategy: "collapse", anxiety: 5, avoidance: 1, meta: 1, empathy: 5, activation: 3, canSayNo: 1, canLeave: 1 },
+      minimizer: { name: "Minimizer", wound: "My needs are too much", fear: "Taking up space will get me rejected", light: "Conservator", strategy: "withdrawal", anxiety: 4, avoidance: 3, meta: 2, empathy: 3, activation: 2, canSayNo: 1, canLeave: 2 },
+      provocateur: { name: "Provocateur", wound: "Being ignored = not existing", fear: "Peace means I disappear", light: "Catalyst", strategy: "volatility", anxiety: 5, avoidance: 2, meta: 2, empathy: 2, activation: 5, canSayNo: 4, canLeave: 3 },
+      observer: { name: "Observer", wound: "Participation = danger", fear: "Engaging will overwhelm my system", light: "Witness", strategy: "withdrawal", anxiety: 2, avoidance: 5, meta: 4, empathy: 1, activation: 1, canSayNo: 3, canLeave: 5 },
+      caretaker: { name: "Caretaker", wound: "Others come first always", fear: "Prioritizing myself = being selfish", light: "Nurturer", strategy: "rescue", anxiety: 5, avoidance: 2, meta: 1, empathy: 5, activation: 3, canSayNo: 1, canLeave: 1 },
+      translator: { name: "Translator", wound: "Being misunderstood or caught between worlds", fear: "If I don't bridge the gap connection is impossible", light: "The Bridge", strategy: "performance", anxiety: 4, avoidance: 2, meta: 4, empathy: 4, activation: 3, canSayNo: 2, canLeave: 3 },
+      patternrecognizer: { name: "Pattern Recognizer", wound: "Seeing what others can't see", fear: "If I don't point it out everything will fall apart", light: "The Seer", strategy: "analysis", anxiety: 4, avoidance: 3, meta: 5, empathy: 3, activation: 3, canSayNo: 3, canLeave: 3 }
+    };
+
+    const strategyColors = {
+      power: '#dc143c',
+      performance: '#ffd700',
+      rescue: '#32cd32',
+      withdrawal: '#4169e1',
+      analysis: '#9370db',
+      volatility: '#ff4500',
+      collapse: '#ff69b4'
+    };
+
+    let currentView = 'attachment';
+    const tooltip = document.getElementById('tooltip');
+
+    // Top 3 masks instead of 1
+    let userMasks = [];
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-' + tab.dataset.view).classList.add('active');
+
+        currentView = tab.dataset.view;
+        drawView(currentView);
+      });
+    });
+
+    function getTooltipContent(mask, view) {
+      const content = { title: mask.name, rows: [] };
+
+      if (view === 'attachment') {
+        content.rows = [
+          { label: 'Anxiety', value: `${mask.anxiety}/5` },
+          { label: 'Avoidance', value: `${mask.avoidance}/5` },
+          { label: 'Fear', value: mask.fear }
+        ];
+      } else if (view === 'metaemp') {
+        content.rows = [
+          { label: 'Meta', value: `${mask.meta}/5` },
+          { label: 'Empathy', value: `${mask.empathy}/5` },
+          { label: 'Wound', value: mask.wound }
+        ];
+      } else if (view === 'activation') {
+        content.rows = [
+          { label: 'Activation', value: `Level ${mask.activation}/5` },
+          { label: 'Wound', value: mask.wound }
+        ];
+      } else if (view === 'strategy') {
+        content.rows = [
+          { label: 'Strategy', value: mask.strategy.toUpperCase() },
+          { label: 'Fear', value: mask.fear }
+        ];
+      } else if (view === 'transform') {
+        content.rows = [
+          { label: 'Shadow', value: mask.name },
+          { label: 'Wound', value: mask.wound },
+          { label: 'Light', value: mask.light },
+          { label: 'What shifts', value: mask.meta >= 4 ? 'Develops self awareness of patterns' : mask.empathy >= 4 ? 'Learns boundaries while maintaining connection' : mask.anxiety >= 4 ? 'Regulates nervous system, feels safer' : 'Builds capacity to tolerate discomfort' }
+        ];
+      } else if (view === 'boundary') {
+        content.rows = [
+          { label: 'Can Say No', value: `${mask.canSayNo}/5` },
+          { label: 'Can Leave', value: `${mask.canLeave}/5` }
+        ];
+      }
+
+      return content;
+    }
+
+    function showTooltip(mask, mouseX, mouseY) {
+      const content = getTooltipContent(mask, currentView);
+
+      tooltip.querySelector('.tooltip-title').textContent = content.title;
+
+      tooltip.querySelectorAll('.tooltip-row').forEach(row => row.remove());
+
+      const titleEl = tooltip.querySelector('.tooltip-title');
+      content.rows.forEach(row => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'tooltip-row';
+        rowEl.innerHTML = `
+          <div class="tooltip-label">${row.label}</div>
+          <div class="tooltip-value">${row.value}</div>
+        `;
+        titleEl.insertAdjacentElement('afterend', rowEl);
+      });
+
+      let x = mouseX + 20;
+      let y = mouseY + 20;
+
+      tooltip.style.display = 'block';
+      const rect = tooltip.getBoundingClientRect();
+
+      if (x + rect.width > window.innerWidth) x = mouseX - rect.width - 20;
+      if (y + rect.height > window.innerHeight) y = mouseY - rect.height - 20;
+      if (x < 0) x = 20;
+      if (y < 0) y = 20;
+
+      tooltip.style.left = x + 'px';
+      tooltip.style.top = y + 'px';
+      tooltip.classList.add('visible');
+    }
+
+    function hideTooltip() {
+      tooltip.classList.remove('visible');
+      // keep display block so layout stays stable, but hide visually
+      // optional: tooltip.style.display = 'none';
+    }
+
+    function isUserMask(mask) {
+      return userMasks.some(m => m.name === mask.name);
+    }
+
+    function drawDot(ctx, mask, x, y) {
+      const color = strategyColors[mask.strategy];
+
+      // base glow
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 15;
+
+      ctx.beginPath();
+      ctx.arc(x, y, 10, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.3;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      ctx.beginPath();
+      ctx.arc(x, y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // highlight top 3 masks
+      if (userMasks.length && isUserMask(mask)) {
+        ctx.save();
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 18;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(x, y, 13, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x, y, 16, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      mask.x = x;
+      mask.y = y;
+    }
+
+    function setupHover(canvas) {
+      canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        let found = null;
+        Object.values(masks).forEach(mask => {
+          if (mask.x && mask.y) {
+            const dist = Math.sqrt((mx - mask.x) ** 2 + (my - mask.y) ** 2);
+            if (dist < 15) found = mask;
+          }
+        });
+
+        if (found) showTooltip(found, e.clientX, e.clientY);
+        else hideTooltip();
+      });
+
+      canvas.addEventListener('mouseleave', hideTooltip);
+    }
+
+    function addJitter(positions, targetX, targetY, maxAttempts = 30) {
+      let x = targetX;
+      let y = targetY;
+      let attempts = 0;
+
+      while (attempts < maxAttempts) {
+        let overlap = false;
+        for (let pos of positions) {
+          const dist = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
+          if (dist < 22) { overlap = true; break; }
+        }
+        if (!overlap) break;
+        x = targetX + (Math.random() - 0.5) * 30;
+        y = targetY + (Math.random() - 0.5) * 30;
+        attempts++;
+      }
+
+      return { x, y };
+    }
+
+    function drawAttachment(canvas, ctx) {
+      const w = canvas.width, h = canvas.height;
+      const pad = 100;
+      const cx = w / 2, cy = h / 2;
+
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pad, cy);
+      ctx.lineTo(w - pad, cy);
+      ctx.moveTo(cx, pad);
+      ctx.lineTo(cx, h - pad);
+      ctx.stroke();
+
+      ctx.fillStyle = '#d4af37';
+      ctx.font = 'bold 14px Cinzel';
+      ctx.textAlign = 'center';
+      ctx.fillText('HIGH ANXIETY', cx, pad - 15);
+      ctx.fillText('LOW ANXIETY', cx, h - pad + 30);
+      ctx.fillText('HIGH AVOID', pad - 40, cy - 10);
+      ctx.fillText('LOW AVOID', w - pad + 40, cy - 10);
+
+      const scaleX = (w - pad * 2) / 4;
+      const scaleY = (h - pad * 2) / 4;
+
+      const positions = [];
+      Object.values(masks).forEach(mask => {
+        const targetX = cx + (3 - mask.avoidance) * scaleX;
+        const targetY = cy + (3 - mask.anxiety) * scaleY;
+        const pos = addJitter(positions, targetX, targetY);
+        positions.push(pos);
+        drawDot(ctx, mask, pos.x, pos.y);
+      });
+    }
+
+    function drawMetaEmp(canvas, ctx) {
+      const w = canvas.width, h = canvas.height;
+      const pad = 100;
+      const cx = w / 2, cy = h / 2;
+
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pad, cy);
+      ctx.lineTo(w - pad, cy);
+      ctx.moveTo(cx, pad);
+      ctx.lineTo(cx, h - pad);
+      ctx.stroke();
+
+      ctx.fillStyle = '#d4af37';
+      ctx.font = 'bold 14px Cinzel';
+      ctx.textAlign = 'center';
+      ctx.fillText('HIGH META', cx, pad - 15);
+      ctx.fillText('LOW META', cx, h - pad + 30);
+      ctx.fillText('LOW EMPATHY', pad - 50, cy - 10);
+      ctx.fillText('HIGH EMPATHY', w - pad + 50, cy - 10);
+
+      const scaleX = (w - pad * 2) / 4;
+      const scaleY = (h - pad * 2) / 4;
+
+      const positions = [];
+      Object.values(masks).forEach(mask => {
+        const targetX = cx + (mask.empathy - 3) * scaleX;
+        const targetY = cy + (3 - mask.meta) * scaleY;
+        const pos = addJitter(positions, targetX, targetY);
+        positions.push(pos);
+        drawDot(ctx, mask, pos.x, pos.y);
+      });
+    }
+
+    function drawActivation(canvas, ctx) {
+      const w = canvas.width, h = canvas.height;
+      const cx = w / 2, cy = h / 2;
+      const maxR = Math.min(w, h) / 2 - 80;
+
+      const rings = [
+        { r: maxR * 0.25, level: 1, masks: [] },
+        { r: maxR * 0.45, level: 2, masks: [] },
+        { r: maxR * 0.65, level: 3, masks: [] },
+        { r: maxR * 0.82, level: 4, masks: [] },
+        { r: maxR * 0.98, level: 5, masks: [] }
+      ];
+
+      Object.values(masks).forEach(mask => {
+        const ring = rings.find(r => r.level === mask.activation);
+        if (ring) ring.masks.push(mask);
+      });
+
+      rings.forEach(ring => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, ring.r, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#d4af37';
+        ctx.font = 'bold 14px Cinzel';
+        ctx.textAlign = 'center';
+        ctx.fillText(`LEVEL ${ring.level}`, cx, cy - ring.r - 12);
+
+        if (ring.masks.length > 0) {
+          ring.masks.forEach((mask, i) => {
+            const angle = (i / ring.masks.length) * Math.PI * 2;
+            const x = cx + ring.r * Math.cos(angle);
+            const y = cy + ring.r * Math.sin(angle);
+            drawDot(ctx, mask, x, y);
+          });
+        }
+      });
+
+      ctx.fillStyle = '#d4af37';
+      ctx.font = 'bold 24px Cinzel';
+      ctx.textAlign = 'center';
+      ctx.fillText('SELF', cx, cy + 8);
+    }
+
+    function drawStrategy(canvas, ctx) {
+      const w = canvas.width, h = canvas.height;
+      const cx = w / 2, cy = h / 2;
+      const r = Math.min(w, h) / 2 - 100;
+
+      const groups = {};
+      Object.values(masks).forEach(mask => {
+        if (!groups[mask.strategy]) groups[mask.strategy] = [];
+        groups[mask.strategy].push(mask);
+      });
+
+      const strategies = Object.keys(groups);
+      let angle = 0;
+
+      strategies.forEach(strategy => {
+        const stratMasks = groups[strategy];
+        const section = (stratMasks.length / 28) * Math.PI * 2;
+
+        const midAngle = angle + section / 2;
+        const lx = cx + (r + 50) * Math.cos(midAngle);
+        const ly = cy + (r + 50) * Math.sin(midAngle);
+        ctx.fillStyle = strategyColors[strategy];
+        ctx.font = 'bold 12px Cinzel';
+        ctx.textAlign = 'center';
+        ctx.fillText(strategy.toUpperCase(), lx, ly);
+
+        stratMasks.forEach((mask, i) => {
+          const a = angle + (i + 0.5) * (section / stratMasks.length);
+          const x = cx + r * Math.cos(a);
+          const y = cy + r * Math.sin(a);
+          drawDot(ctx, mask, x, y);
+        });
+
+        angle += section;
+      });
+
+      ctx.fillStyle = '#d4af37';
+      ctx.font = 'bold 24px Cinzel';
+      ctx.textAlign = 'center';
+      ctx.fillText('SELF', cx, cy + 8);
+    }
+
+    function drawTransform(canvas, ctx) {
+      const w = canvas.width, h = canvas.height;
+      const shadowX = w * 0.3;
+      const lightX = w * 0.7;
+      const topPad = 80;
+      const bottomPad = 40;
+      const spacing = (h - topPad - bottomPad) / 30;
+
+      ctx.fillStyle = '#d4af37';
+      ctx.font = 'bold 16px Cinzel';
+      ctx.textAlign = 'center';
+      ctx.fillText('SHADOW', shadowX, 40);
+      ctx.fillText('LIGHT', lightX, 40);
+
+      Object.values(masks).forEach((mask, i) => {
+        const y = topPad + i * spacing;
+
+        drawDot(ctx, mask, shadowX, y);
+        ctx.fillStyle = '#e8d4b8';
+        ctx.font = '10px Cormorant Garamond';
+        ctx.textAlign = 'right';
+        ctx.fillText(mask.name, shadowX - 15, y + 3);
+
+        ctx.fillStyle = '#32cd32';
+        ctx.textAlign = 'left';
+        ctx.fillText(mask.light, lightX + 15, y + 3);
+
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(shadowX + 10, y);
+        ctx.lineTo(lightX - 10, y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.beginPath();
+        ctx.arc(lightX, y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#32cd32';
+        ctx.fill();
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      });
+    }
+
+    function drawBoundary(canvas, ctx) {
+      const w = canvas.width, h = canvas.height;
+      const pad = 100;
+      const cx = w / 2, cy = h / 2;
+
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pad, cy);
+      ctx.lineTo(w - pad, cy);
+      ctx.moveTo(cx, pad);
+      ctx.lineTo(cx, h - pad);
+      ctx.stroke();
+
+      ctx.fillStyle = '#d4af37';
+      ctx.font = 'bold 14px Cinzel';
+      ctx.textAlign = 'center';
+      ctx.fillText('CAN SAY NO', cx, pad - 15);
+      ctx.fillText("CAN'T SAY NO", cx, h - pad + 30);
+      ctx.fillText("CAN'T LEAVE", pad - 40, cy - 10);
+      ctx.fillText('CAN LEAVE', w - pad + 40, cy - 10);
+
+      const scaleX = (w - pad * 2) / 4;
+      const scaleY = (h - pad * 2) / 4;
+
+      const positions = [];
+      Object.values(masks).forEach(mask => {
+        const targetX = cx + (mask.canLeave - 3) * scaleX;
+        const targetY = cy + (3 - mask.canSayNo) * scaleY;
+        const pos = addJitter(positions, targetX, targetY);
+        positions.push(pos);
+        drawDot(ctx, mask, pos.x, pos.y);
+      });
+    }
+
+    function drawView(view) {
+      const canvas = document.getElementById('canvas-' + view);
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = Math.min(canvas.parentElement.clientWidth - 40, 1200);
+
+      if (view === 'transform') {
+        canvas.height = Math.min(window.innerHeight * 0.9, 1600);
+      } else {
+        canvas.height = Math.min(window.innerHeight * 0.7, 900);
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (view === 'attachment') drawAttachment(canvas, ctx);
+      else if (view === 'metaemp') drawMetaEmp(canvas, ctx);
+      else if (view === 'activation') drawActivation(canvas, ctx);
+      else if (view === 'strategy') drawStrategy(canvas, ctx);
+      else if (view === 'transform') drawTransform(canvas, ctx);
+      else if (view === 'boundary') drawBoundary(canvas, ctx);
+
+      setupHover(canvas);
+    }
+
+    const legend = document.getElementById('legend');
+    Object.entries(strategyColors).forEach(([strategy, color]) => {
+      const item = document.createElement('div');
+      item.className = 'legend-item';
+      item.innerHTML = `
+        <div class="legend-color" style="background: ${color};"></div>
+        <span class="legend-label">${strategy}</span>
+      `;
+      legend.appendChild(item);
+    });
+
+    drawView('attachment');
+    window.addEventListener('resize', () => drawView(currentView));
+
+    // Quiz Logic
+    let quizScores = {
+      anxiety: 0,
+      avoidance: 0,
+      meta: 0,
+      empathy: 0,
+      activation: 0,
+      canSayNo: 0,
+      canLeave: 0,
+      strategyCount: {}
+    };
+
+    let answeredQuestions = 0;
+
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const scores = JSON.parse(this.dataset.score);
+
+        Object.keys(scores).forEach(key => {
+          if (key === 'strategy') {
+            quizScores.strategyCount[scores[key]] = (quizScores.strategyCount[scores[key]] || 0) + 1;
+          } else {
+            quizScores[key] += scores[key];
+          }
+        });
+
+        answeredQuestions++;
+
+        const currentQ = document.querySelector('.question.active');
+        currentQ.classList.remove('active');
+        const nextQ = document.querySelector(`.question[data-q="${answeredQuestions + 1}"]`);
+
+        if (nextQ) nextQ.classList.add('active');
+        else calculateResultTop3();
+      });
+    });
+
+    function calculateResultTop3() {
+      const avgAnxiety = Math.round(quizScores.anxiety / answeredQuestions);
+      const avgAvoidance = Math.round(quizScores.avoidance / answeredQuestions);
+      const avgMeta = Math.round(quizScores.meta / answeredQuestions);
+      const avgEmpathy = Math.round(quizScores.empathy / answeredQuestions);
+      const avgActivation = Math.round(quizScores.activation / answeredQuestions);
+      const avgCanSayNo = Math.round(quizScores.canSayNo / answeredQuestions);
+      const avgCanLeave = Math.round(quizScores.canLeave / answeredQuestions);
+
+      let topStrategy = 'performance';
+      let maxCount = 0;
+      Object.entries(quizScores.strategyCount).forEach(([strategy, count]) => {
+        if (count > maxCount) {
+          maxCount = count;
+          topStrategy = strategy;
+        }
+      });
+
+      const ranked = Object.values(masks).map(mask => {
+        const distance =
+          Math.abs(mask.anxiety - avgAnxiety) +
+          Math.abs(mask.avoidance - avgAvoidance) +
+          Math.abs(mask.meta - avgMeta) +
+          Math.abs(mask.empathy - avgEmpathy) +
+          Math.abs(mask.activation - avgActivation) +
+          Math.abs(mask.canSayNo - avgCanSayNo) +
+          Math.abs(mask.canLeave - avgCanLeave) +
+          (mask.strategy === topStrategy ? 0 : 2);
+
+        return { mask, distance };
+      }).sort((a, b) => a.distance - b.distance);
+
+      userMasks = ranked.slice(0, 3).map(r => r.mask);
+      showResultTop3(userMasks);
+    }
+
+    function showResultTop3(topMasks) {
+      document.getElementById('quiz-questions').style.display = 'none';
+      document.getElementById('quiz-result').style.display = 'block';
+
+      const cards = topMasks.map((mask, idx) => {
+        const color = strategyColors[mask.strategy] || '#d4af37';
+        return `
+          <div class="result-card">
+            <div class="result-rank">Match ${idx + 1}</div>
+            <div class="result-mask-name" style="color:${color}">${mask.name}</div>
+            <div class="result-detail"><span class="result-label">Wound:</span> ${mask.wound}</div>
+            <div class="result-detail"><span class="result-label">Fear:</span> ${mask.fear}</div>
+            <div class="result-detail"><span class="result-label">Light Version:</span> ${mask.light}</div>
+            <div class="result-detail"><span class="result-label">Strategy:</span> ${mask.strategy.toUpperCase()}</div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('result-content').innerHTML = `<div class="result-grid">${cards}</div>`;
+    }
+
+    document.getElementById('explore-btn').addEventListener('click', () => {
+      document.getElementById('quiz-page').style.display = 'none';
+      document.getElementById('matrix-page').style.display = 'block';
+      currentView = 'attachment';
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelector('.tab[data-view="attachment"]').classList.add('active');
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-attachment').classList.add('active');
+      drawView('attachment');
+    });
+  </script>
+</body>
+</html>
