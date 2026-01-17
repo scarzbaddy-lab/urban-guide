@@ -1026,15 +1026,19 @@
       });
 
       const ranked = Object.values(masks).map(mask => {
+        // PRIORITIZE meta and empathy when both are high
+        const metaWeight = avgMeta >= 4 ? 3 : 1.5;
+        const empWeight = avgEmpathy >= 4 ? 2.5 : 1.5;
+        
         const distance =
-          Math.abs(mask.anxiety - avgAnxiety) +
-          Math.abs(mask.avoidance - avgAvoidance) +
-          Math.abs(mask.meta - avgMeta) +
-          Math.abs(mask.empathy - avgEmpathy) +
-          Math.abs(mask.activation - avgActivation) +
-          Math.abs(mask.canSayNo - avgCanSayNo) +
-          Math.abs(mask.canLeave - avgCanLeave) +
-          (mask.strategy === topStrategy ? 0 : 2);
+          Math.abs(mask.meta - avgMeta) * metaWeight +         // META IS CRITICAL when high
+          Math.abs(mask.empathy - avgEmpathy) * empWeight +    // EMPATHY IS CRITICAL when high
+          Math.abs(mask.anxiety - avgAnxiety) * 2 +        
+          Math.abs(mask.avoidance - avgAvoidance) * 1.5 +  
+          Math.abs(mask.activation - avgActivation) * 1 +  
+          Math.abs(mask.canSayNo - avgCanSayNo) * 1.5 +        // Reduced from 2.5
+          Math.abs(mask.canLeave - avgCanLeave) * 1.5 +        // Reduced from 2
+          (mask.strategy === topStrategy ? 0 : 3);
 
         return { mask, distance };
       }).sort((a, b) => a.distance - b.distance);
